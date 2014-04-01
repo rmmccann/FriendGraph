@@ -1,0 +1,113 @@
+<html>
+<head>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/2.3.2/css/bootstrap.min.css">
+<!-- Optional theme -->
+<!--<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">-->
+<!-- Latest compiled and minified JavaScript -->
+<script src="//netdna.bootstrapcdn.com/bootstrap/2.3.2/js/bootstrap.min.js"></script>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<!--<script type="text/javascript" src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>-->
+<script type="text/javascript" src="d3.min.js" charset="utf-8"></script>
+<script type="text/javascript" src="main.js"></script>
+<script type="text/javascript" src="fb.js"></script>
+<script type="text/javascript">
+//
+var width = 1100;
+var height = 800;
+width = window.innerWidth;
+height = window.innerHeight;
+
+$(document).ready(function(){
+	// var svg = $("body").append($("svg"))
+	// .attr("width", width)
+	// .attr("height", height);
+
+	svg = d3.select("body").append("svg")
+	.attr("width", width)
+	.attr("height", height);
+
+	force = d3.layout.force()
+	.gravity(.04)
+	.distance(200)
+	.charge(-80)
+	.size([width, height]);
+});
+
+//	d3.json("test.json", function(error, json) {
+	function dataLoaded(friends, links)
+	{
+		force.nodes(friends)
+		.links(links)
+		.start();
+
+
+		var link = svg.selectAll(".link")
+		.data(links)
+		.enter().append("line")
+		.attr("class", "link");
+
+		var node = svg.selectAll(".node")
+		.data(friends)
+		.enter().append("g")
+		.attr("class", "node")
+		.call(force.drag);
+
+		node.append("circle")
+		.attr("r", 12);
+		node.append("text")
+		.attr("dx", 12)
+		.attr("dy", ".35em")
+		.text(function(d) { return d.name });
+
+		force.on("tick", function()
+		{
+			link.attr("x1", function(d) { return d.source.x; })
+			.attr("y1", function(d) { return d.source.y; })
+			.attr("x2", function(d) { return d.target.x; })
+			.attr("y2", function(d) { return d.target.y; });
+
+			node.attr("transform", function(d)
+			{
+				return "translate(" + d.x + "," + d.y + ")";
+			});
+		});
+	}
+
+
+</script>
+<style>
+.link {
+	fill: none;
+	stroke: #666;
+	stroke-width: 1.5px;
+}
+.node circle
+{
+	fill: steelblue;
+	stroke: #fff;
+	stroke-width: 1.5px;
+}
+.node text
+{
+	pointer-events: none;
+	font: 12px sans-serif;
+}
+</style>
+</head>
+<body>
+	<!-- Top menu bar -->
+	<div class="navbar navbar-fixed-top --navbar-static-top --navbar-inverse">
+		<div class="navbar-inner" style="padding-left: 30px;">
+			<span class="brand">FriendGraph</span>
+			<ul class="nav">
+				<li class="active"><a href="#facebook">Facebook</a></li>
+				<li><a href="#twitter">Twitter</a></li>
+			</ul>
+		</div>
+	</div>
+
+</body>
+</html>
